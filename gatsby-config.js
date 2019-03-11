@@ -1,5 +1,3 @@
-const languages = require('./languages');
-
 module.exports = {
   siteMetadata: {
     title: 'Overreacted',
@@ -44,6 +42,12 @@ module.exports = {
           },
           'gatsby-remark-copy-linked-files',
           'gatsby-remark-smartypants',
+          {
+            resolve: 'gatsby-remark-external-links',
+            options: {
+              target: '_blank',
+            },
+          },
         ],
       },
     },
@@ -78,7 +82,7 @@ module.exports = {
                 const postText = `
                 <div style="margin-top=55px; font-style: italic;">(This is an article posted to my blog at overreacted.io. You can read it online by <a href="${siteUrl +
                   edge.node.fields.slug}">clicking here</a>.)</div>
-              `
+              `;
 
                 let html = edge.node.html;
                 // Hacky workaround for https://github.com/gaearon/overreacted.io/issues/65
@@ -90,14 +94,12 @@ module.exports = {
 
                 return Object.assign({}, edge.node.frontmatter, {
                   description: edge.node.frontmatter.spoiler,
-                  date: edge.node.fields.date,
+                  date: edge.node.frontmatter.date,
                   url: site.siteMetadata.siteUrl + edge.node.fields.slug,
                   guid: site.siteMetadata.siteUrl + edge.node.fields.slug,
-                  custom_elements: [
-                    { 'content:encoded': html + postText },
-                  ],
-                })
-              })
+                  custom_elements: [{ 'content:encoded': html + postText }],
+                });
+              });
             },
             query: `
               {
@@ -124,7 +126,7 @@ module.exports = {
               }
             `,
             output: '/rss.xml',
-            title: 'Dan Abramov\'s Overreacted Blog RSS Feed',
+            title: "Dan Abramov's Overreacted Blog RSS Feed",
           },
         ],
       },
@@ -139,6 +141,7 @@ module.exports = {
         theme_color: `#ffa7c4`,
         display: `minimal-ui`,
         icon: `src/assets/icon.png`,
+        theme_color_in_head: false,
       },
     },
     `gatsby-plugin-react-helmet`,
@@ -151,9 +154,10 @@ module.exports = {
     {
       resolve: 'gatsby-plugin-i18n',
       options: {
-        langKeyDefault: languages.defaultLangKey,
+        langKeyDefault: 'en',
         useLangKeyLayout: false,
-      }
+      },
     },
+    `gatsby-plugin-catch-links`,
   ],
-}
+};
